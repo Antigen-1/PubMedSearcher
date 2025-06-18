@@ -7,3 +7,16 @@ requires-python = ">=3.11"
 dependencies = [
     "pymed>=0.8.9",
 ]
+
+[build-system]
+requires = ['setuptools']
+
+[project.scripts]
+add-caption = "main:main"
+
+[tool.setuptools]
+py-modules = ['main', 'args', 'core']
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]

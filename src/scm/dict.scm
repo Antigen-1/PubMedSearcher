@@ -3,7 +3,7 @@
         (let ((new-make-exn (#%vm-procedure make-exn 1))
               (tuple (make-procedure (lambda (t) t))))
             (#%scm-procedure 
-                (lambda (value needed)
+                (lambda (needed)
                     (let/cc exit
                         (let ((nl (length needed))
                               (result #hasheq{}))
@@ -13,13 +13,16 @@
                                     (if (? supported-string:constructor (@ needed i))
                                         (loop (+ i 1))
                                         (exit (make-exn (+ (@ needed i) ": not supported"))))))
-                            (let loop ((i 0))
-                                (if (equal? i nl)
-                                    result
-                                    (let ((field (@ needed i)))
-                                        (! result field 
-                                           (vm-apply (@ supported-string:constructor field)
-                                                     (tuple value)))
-                                        (loop (+ i 1))))))))
-        2)))
+                            (#%scm-procedure 
+                                (lambda (value)
+                                    (let loop ((i 0))
+                                        (if (equal? i nl)
+                                            result
+                                            (let ((field (@ needed i)))
+                                                (! result field 
+                                                (vm-apply (@ supported-string:constructor field)
+                                                             (tuple value)))
+                                                (loop (+ i 1))))))
+                                1))))
+        1)))
     2)

@@ -1,6 +1,6 @@
 [project]
 name = "pubmed-info"
-version = "2.0.1"
+version = "2.1.0"
 description = "Save information of pubmed articles as a JSON file."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -12,10 +12,10 @@ dependencies = [
 requires = ['setuptools']
 
 [project.scripts]
-add-caption = "main:main"
+dump-articles = "main:main"
 
 [tool.setuptools]
-py-modules = ['main', 'args', 'core']
+py-modules = ['main', 'args', 'core', 'path]
 include-package-data = true
 
 [tool.setuptools.packages.find]

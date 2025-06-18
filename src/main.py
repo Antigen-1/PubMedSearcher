@@ -34,14 +34,15 @@ def main():
         json_code = f.read().rstrip()
     
     make_partial_dict = core.run(json_code)(constructors, Exception)(fields)
+    if isinstance(make_partial_dict, Exception):
+            print(f"{make_partial_dict}", file=sys.stderr)
+            return
 
     results = []
     pubmed = pymed.PubMed(tool='PubMedSearcher', email='myemail@ccc.com')
     articles = pubmed.query(term, max_results=num)
     for article in articles:
         r = make_partial_dict(article.toDict())
-        if isinstance(r, Exception):
-            print(f"Error processing article: {r}", file=sys.stderr)
         results.append(r)
     
     with open(output, "w") as f:

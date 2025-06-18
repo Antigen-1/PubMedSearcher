@@ -12,6 +12,6 @@ def parse_args():
         fields = [field.strip() for field in args.fields.split(',')]
     output = args.output.strip()
     term = args.term.strip()
-    number = args.number.strip()
+    number = args.number
     return (fields, output, term, number)
     

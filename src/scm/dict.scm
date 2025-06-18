@@ -1,5 +1,5 @@
 (#%scm-procedure 
-    (lambda (supported-string:constructor make-exn)
+    (lambda (supported-string:accessor make-exn)
         (let ((new-make-exn (#%vm-procedure make-exn 1))
               (tuple (make-procedure (lambda (t) t))))
             (#%scm-procedure 
@@ -10,7 +10,7 @@
                             (let loop ((i 0))
                                 (if (equal? i nl)
                                     'none
-                                    (if (? supported-string:constructor (@ needed i))
+                                    (if (? supported-string:accessor (@ needed i))
                                         (loop (+ i 1))
                                         (exit (make-exn (+ (@ needed i) ": not supported"))))))
                             (#%scm-procedure 
@@ -20,7 +20,7 @@
                                             result
                                             (let ((field (@ needed i)))
                                                 (! result field 
-                                                (vm-apply (@ supported-string:constructor field)
+                                                (vm-apply (@ supported-string:accessor field)
                                                              (tuple value)))
                                                 (loop (+ i 1))))))
                                 1))))

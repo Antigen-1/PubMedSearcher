@@ -9,7 +9,7 @@ import os.path
 
 # https://stackoverflow.com/questions/57053378/query-pubmed-with-python-how-to-get-all-article-details-from-query-to-pandas-d
 
-constructors = {
+accessors = {
     'pubmed_id': lambda a: a['pubmed_id'].partition('\n')[0],
     'title': lambda a: a['title'],
     'keywords': lambda a: a['keywords'],
@@ -27,13 +27,13 @@ constructors = {
 def main():
     (fields, output, term, num) = args.parse_args()
     if fields is None:
-        fields = list(constructors.keys())
+        fields = list(accessors.keys())
     
     json_code = None
     with open(os.path.join(path.SRC_PATH, "json/dict.json"), "r") as f:
         json_code = f.read().rstrip()
     
-    make_partial_dict = core.run(json_code)(constructors, Exception)(fields)
+    make_partial_dict = core.run(json_code)(accessors, Exception)(fields)
     if isinstance(make_partial_dict, Exception):
             print(f"{make_partial_dict}", file=sys.stderr)
             return

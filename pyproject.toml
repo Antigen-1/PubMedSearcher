@@ -15,7 +15,7 @@ requires = ['setuptools']
 dump-articles = "main:main"
 
 [tool.setuptools]
-py-modules = ['main', 'args', 'core', 'path]
+py-modules = ['main', 'args', 'core', 'path']
 include-package-data = true
 
 [tool.setuptools.packages.find]

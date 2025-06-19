@@ -2,10 +2,10 @@
 import args
 import core
 import pymed
-import sys
 import json
 import path
 import os.path
+import term
 
 # https://stackoverflow.com/questions/57053378/query-pubmed-with-python-how-to-get-all-article-details-from-query-to-pandas-d
 
@@ -25,24 +25,28 @@ accessors = {
 }
 
 def main():
-    (fields, output, term, num) = args.parse_args()
+    (fields, output, term_str, num) = args.parse_args()
     if fields is None:
         fields = list(accessors.keys())
     
     json_code = None
-    with open(os.path.join(path.SRC_PATH, "json/dict.json"), "r") as f:
+    with open(os.path.join(path.SRC_PATH, "json/parser.json"), "r") as f:
         json_code = f.read().rstrip()
-    
-    make_partial_dict = core.run(json_code)(accessors, Exception)(fields)
-    if isinstance(make_partial_dict, Exception):
-            print(f"{make_partial_dict}", file=sys.stderr)
-            return
+
+    parsed_term = core.run(json_code)(term_str, term.cons_term, lambda s: s=="(", lambda s: s==")", lambda s: s.isspace(), Exception)
+    if isinstance(parsed_term, Exception):
+        raise parsed_term
+    real_term = term.render_term(parsed_term)
+    print(f"Compiled term: {real_term}")
 
     results = []
     pubmed = pymed.PubMed(tool='PubMedSearcher', email='myemail@ccc.com')
-    articles = pubmed.query(term, max_results=num)
+    articles = pubmed.query(real_term, max_results=num)
     for article in articles:
-        r = make_partial_dict(article.toDict())
+        d = article.toDict()
+        r = {}
+        for field in fields:
+            r[field] = d[field]
         results.append(r)
     
     with open(output, "w") as f:

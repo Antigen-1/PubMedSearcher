@@ -1,1 +1,1 @@
-include src/json/dict.json
+include src/json/parser.json

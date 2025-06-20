@@ -22,8 +22,8 @@ class Plain:
 class Annotation:
     def __init__(self, arg, *args):
         assert isinstance(arg, str)
-        for arg in args:
-            assert isinstance(arg, str)
+        for a in args:
+            assert isinstance(a, str)
         sep = " "
         self.text = f"{repr(sep.join(args))}[{arg}]"
 
@@ -39,7 +39,7 @@ def render_term(parsed_term: ParsedTerm) -> str:
         l = []
         for subform in parsed_term.subforms:
             l.append(render_term(subform))
-        return sep.join(l)
+        return "(" + sep.join(l) + ")"
     if isinstance(parsed_term, Plain) or isinstance(parsed_term, Annotation):
         return parsed_term.text
         

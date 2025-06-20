@@ -29,14 +29,7 @@ def main():
     if fields is None:
         fields = list(accessors.keys())
     
-    json_code = None
-    with open(os.path.join(path.SRC_PATH, "json/parser.json"), "r") as f:
-        json_code = f.read().rstrip()
-
-    parsed_term = core.run(json_code)(term_str, term.cons_term, lambda s: s=="(", lambda s: s==")", lambda s: s.isspace(), Exception)
-    if isinstance(parsed_term, Exception):
-        raise parsed_term
-    real_term = term.render_term(parsed_term)
+    real_term = term.compile_term(term_str)
     print(f"Compiled term: {real_term}")
 
     results = []

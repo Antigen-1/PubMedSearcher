@@ -1,4 +1,7 @@
 import typing
+import core
+import path
+import os.path
 
 def isTerm(v) -> bool:
     return isinstance(v, Or) or isinstance(v, And) or isinstance(v, Plain) or isinstance(v, Annotation)
@@ -51,3 +54,13 @@ def cons_term(t, *args) -> ParsedTerm:
     if t == "And":
         return And(*args)
     return Annotation(t, *args)
+
+def compile_term(s: str) -> str:
+    code = ""
+    with open(os.path.join(path.SRC_PATH, "json", "parser.json"), "rt") as f:
+        code = f.read().rstrip()
+    parse_term = core.run(code)
+    parsed_term = parse_term(s, cons_term, lambda s: s=="(", lambda s: s==")", lambda s: s.isspace(), Exception)
+    if isinstance(parsed_term, Exception):
+        raise parsed_term
+    return render_term(parsed_term)

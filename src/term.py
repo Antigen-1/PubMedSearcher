@@ -1,17 +1,29 @@
 import typing
 
+def isTerm(v) -> bool:
+    return isinstance(v, Or) or isinstance(v, And) or isinstance(v, Plain) or isinstance(v, Annotation)
+
 class Or:
     def __init__(self, *args):
+        for arg in args:
+            assert isTerm(arg)
         self.subforms = args
 class And:
     def __init__(self, *args):
+        for arg in args:
+            assert isTerm(arg)
         self.subforms = args
 class Plain:
     def __init__(self, *args):
+        for arg in args:
+            assert isinstance(arg, str)
         sep = " "
         self.text = repr(sep.join(args))
 class Annotation:
     def __init__(self, arg, *args):
+        assert isinstance(arg, str)
+        for arg in args:
+            assert isinstance(arg, str)
         sep = " "
         self.text = f"{repr(sep.join(args))}[{arg}]"
 

@@ -1,47 +1,66 @@
 (#%scm-procedure
-    (lambda (string cons is-left-paren? is-right-paren? is-seperator? make-exn)
+    (lambda (string cons is-left-paren? is-right-paren? is-seperator? is-escape? make-exn)
         (let ((string-length (length string))
               (cons (#%vm-procedure cons #f))
               (is-left-paren? (#%vm-procedure is-left-paren? 1))
               (is-right-paren? (#%vm-procedure is-right-paren? 1))
               (is-seperator? (#%vm-procedure is-seperator? 1))
+              (is-escape? (#%vm-procedure is-escape? 1))
               (make-exn (#%vm-procedure make-exn 1))
               (left-paren 0)
               (right-paren 1)
               (eof 2))
-            (letrec ((string-append* 
-                        (lambda (sl)
-                            (let ((l (length sl)))
-                                (let loop ((i 0))
-                                    (if (equal? i l)
-                                        ""
-                                        (+ (@ sl i) (loop (+ i 1))))))))
-                     (lexer 
-                        (let ((i 0)
-                              (sl '()))
-                            (lambda ()
-                                (let/cc break
-                                    (let loop ()
-                                        (if (equal? string-length i)
-                                            (break eof))
-                                        (let ((c (@ string i)))
-                                            (if (or (is-left-paren? c)
-                                                    (is-right-paren? c)
-                                                    (is-seperator? c))
-                                                (if (not (equal? (length sl) 0))
-                                                    (let ((r (string-append* sl)))
-                                                        (set! sl '())
-                                                        (break r))))
-                                            (set! i (+ i 1))
-                                            (if (is-left-paren? c)
-                                                (break left-paren))
-                                            (if (is-right-paren? c)
-                                                (break right-paren))
-                                            (if (is-seperator? c)
-                                                'none
-                                                (<! sl c))
-                                            (loop))))))))    
-                (let/cc break
+            (let/cc return
+                (letrec ((string-append* 
+                            (lambda (sl)
+                                (let ((l (length sl)))
+                                    (let loop ((i 0))
+                                        (if (equal? i l)
+                                            ""
+                                            (+ (@ sl i) (loop (+ i 1))))))))
+                        (lexer 
+                            (let ((i 0)
+                                  (sl '()))
+                                (lambda ()
+                                    (let/cc break
+                                        (let loop ()
+                                            (if (equal? string-length i)
+                                                (break eof))
+                                            (let ((c (@ string i)))
+                                                (if (or (is-left-paren? c)
+                                                        (is-right-paren? c)
+                                                        (is-seperator? c))
+                                                    (if (not (equal? (length sl) 0))
+                                                        (let ((r (string-append* sl)))
+                                                            (set! sl '())
+                                                            (break r))))
+
+                                                (set! i (+ i 1))
+
+                                                ;; These branches must break the loop using `return` or `break`
+                                                (if (is-left-paren? c)
+                                                    (break left-paren))
+                                                (if (is-right-paren? c)
+                                                    (break right-paren))
+                                                (if (is-escape? c)
+                                                    (begin
+                                                        (if (equal? i string-length)
+                                                            (return (make-exn "Lexer: Unexpected EOF")))
+                                                        (let ((nc (@ string i)))
+                                                            (if (or (is-left-paren? nc)
+                                                                    (is-right-paren? nc)
+                                                                    (is-seperator? nc)
+                                                                    (is-escape? nc))
+                                                                (begin
+                                                                    (set! i (+ i 1))
+                                                                    (<! sl nc)
+                                                                    (break (loop)))
+                                                                (return (make-exn (+ "Lexer: Cannot esacpe " nc)))))))
+
+                                                (if (is-seperator? c)
+                                                    'none
+                                                    (<! sl c))
+                                                (loop))))))))    
                     (let ((current (lexer)))
                         (if (equal? current left-paren)
                             (let loop ((acc '()))
@@ -52,9 +71,9 @@
                                           ((equal? current right-paren)
                                            (apply cons acc))
                                           ((equal? current eof)
-                                           (break (make-exn "Parser: Unexpected EOF")))
+                                           (return (make-exn "Parser: Unexpected EOF")))
                                           (else 
                                             (<! acc current)
                                             (loop acc)))))
-                            (make-exn "Parser: Expects (")))))))
-    6)
+                            (return (make-exn "Parser: Expects ("))))))))
+    7)

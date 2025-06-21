@@ -25,12 +25,18 @@ accessors = {
 }
 
 def main():
-    (fields, output, term_str, num) = args.parse_args()
+    (fields, output, term_str, num, dry_run) = args.parse_args()
     if fields is None:
         fields = list(accessors.keys())
     
     real_term = term.compile_term(term_str)
     print(f"Compiled term: {real_term}")
+    if dry_run:
+        return
+    if output is None:
+        raise Exception("An output file path is required.")
+    if num is None:
+        raise Exception("An upper bound of the number of results is required.")
 
     results = []
     pubmed = pymed.PubMed(tool='PubMedSearcher', email='myemail@ccc.com')

@@ -60,7 +60,7 @@ def compile_term(s: str) -> str:
     with open(os.path.join(path.SRC_PATH, "json", "parser.json"), "rt") as f:
         code = f.read().rstrip()
     parse_term = core.run(code)
-    parsed_term = parse_term(s, cons_term, lambda s: s=="(", lambda s: s==")", lambda s: s.isspace(), Exception)
+    parsed_term = parse_term(s, cons_term, lambda s: s=="(", lambda s: s==")", lambda s: s.isspace(), lambda s: s=="\\", Exception)
     if isinstance(parsed_term, Exception):
         raise parsed_term
     return render_term(parsed_term)

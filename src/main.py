@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import args
-import core
 import pymed
 import json
-import path
-import os.path
 import term
+import ui
 
 # https://stackoverflow.com/questions/57053378/query-pubmed-with-python-how-to-get-all-article-details-from-query-to-pandas-d
 
@@ -25,18 +23,18 @@ accessors = {
 }
 
 def main():
-    (fields, output, term_str, num, dry_run) = args.parse_args()
+    (fields, output, term_str, ui_bool, num, dry_run) = args.parse_args()
     if fields is None:
         fields = list(accessors.keys())
     
+    if ui_bool:
+        app = ui.TermBuildApplication()
+        app.run()
+        term_str = app.getForm(name="MAIN").current.value
     real_term = term.compile_term(term_str)
     print(f"Compiled term: {real_term}")
     if dry_run:
         return
-    if output is None:
-        raise Exception("An output file path is required.")
-    if num is None:
-        raise Exception("An upper bound of the number of results is required.")
 
     results = []
     pubmed = pymed.PubMed(tool='PubMedSearcher', email='myemail@ccc.com')

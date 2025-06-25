@@ -3,12 +3,12 @@ import ui
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--fields', default=None, help='Fields to be processed. Comma-separated list of field names.')
-    parser.add_argument('-o', '--output', default=None, help='Output JSON file path where the processed data will be saved.')
-    parser.add_argument('-t', '--term', default=None, help='The query string used to filter articles.')
-    parser.add_argument('-u', '--ui', default=None, action='store_true', help='Open a CLI form to build a query string.')
-    parser.add_argument('-n', '--number', type=int, default=None, help='The number of articles being fetched.')
-    parser.add_argument('-d', '--dry-run', default=None, action='store_true', help='The term is compiled and printed. Nothing else will be done.')
+    parser.add_argument('-f', '--fields', default=None, help='fields to be processed. Comma-separated list of field names.')
+    parser.add_argument('-o', '--output', default=None, help='output JSON file path where the processed data will be saved.')
+    parser.add_argument('-t', '--term', default=None, help='the query string used to filter articles.')
+    parser.add_argument('-u', '--ui', default=None, action='store_true', help='open a CLI form to build a query string.')
+    parser.add_argument('-n', '--number', type=int, default=None, help='the maximum number of articles being fetched.')
+    parser.add_argument('-d', '--dry-run', default=None, action='store_true', help='the term is compiled and printed. Nothing else will be done.')
     args = parser.parse_args()
     fields = None
     if args.fields:
@@ -26,7 +26,7 @@ def parse_args():
     if not output and not dry_run:
         raise Exception("An output file path is required.")
     if not isinstance(number, int) and not dry_run:
-        raise Exception("An upper bound of the number of results is required.")
+        raise Exception("The maximum number of results is required.")
 
     return (fields, output, term, ui, number, dry_run)
     

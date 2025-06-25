@@ -6,21 +6,20 @@ import traceback
 class TermBuildForm(npyscreen.Form):
     def create(self):
         def output(ss: typing.List[str]):
-            self.output.values.append("")
             for s in ss:
-                self.output.values.append(s)
-            self.output.values.append("")
+                self.output.values().append(s.rstrip())
+            self.output.values().append("")
             self.output.display()
         class Confirm(npyscreen.ButtonPress):
             def whenPressed(this):
                 ind1 = self.connective.value
                 if len(ind1) == 0:
-                    output([f"Please select a connective first."])
+                    output([f"submit: Please select a connective first."])
                     return
                 conn = ["And", "Or"][ind1[0]]
                 ind2 = self.field.value
                 if len(ind2) == 0:
-                    output(["Please select a field first."])
+                    output(["submit: Please select a field first."])
                     return
                 prefix = ["Plain ", ""][ind2[0]]
                 self.current.value = f"({conn} ({prefix}{self.input.value}) {self.current.value})"
@@ -31,9 +30,15 @@ class TermBuildForm(npyscreen.Form):
             def whenPressed(this):
                 try:
                     terms = mesh.search_mesh_terms(self.input.value, "startswith", 20)
-                    output(terms)
+                    output([f"{repr(self.input.value)} search results:"]+terms)
                 except Exception as e:
                     output(traceback.format_exception_only(e))
+        class Output(npyscreen.BoxTitle):
+            _contained_widget_class = npyscreen.TitlePager
+            def values(self):
+                return self.entry_widget.values
+            def display(self):
+                self.entry_widget.display()
 
         self.connective = self.add(npyscreen.TitleSelectOne, name="Connective", values=["And", "Or"], scroll_exit = True, max_height=2)
         self.field = self.add(npyscreen.TitleSelectOne, name="Field", values=["All Fields", "User-defined Field"], scroll_exit = True, max_height=2)
@@ -43,7 +48,7 @@ class TermBuildForm(npyscreen.Form):
         self.search = self.add(Search, name="search")
 
         self.current = self.add(npyscreen.TitleText, name="Current Query String")
-        self.output = self.add(npyscreen.TitlePager, name="Output")
+        self.output = self.add(Output, name="Output", scroll_exit=True)
     
     def afterEditing(self):
         self.parentApp.setNextForm(None)

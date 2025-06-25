@@ -6,11 +6,15 @@ import term
 import curses.ascii
 
 class TermBuildForm(npyscreen.Form):
+    __slots__ = ("connective", "field", "input", "current", "submit", "compile", "output",)
+
+    # output
     def send_output(self, ss: typing.List[str]):
         for s in ss:
             self.output.values().append(s.rstrip())
         self.output.values().append("")
         self.output.display()
+    # input
     def do_search(self, *args):
         try:
             terms = mesh.search_mesh_terms(self.input.value, "startswith", 20)

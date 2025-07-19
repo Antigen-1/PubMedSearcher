@@ -29,7 +29,7 @@ class TermBuildForm(npyscreen.Form):
                 if len(ind1) == 0:
                     self.send_output([f"submit: Please select a connective first."])
                     return
-                conn = ["And", "Or"][ind1[0]]
+                conn = ["And", "Or", "Not"][ind1[0]]
                 # Strip the string to test for empty input
                 prefix = self.field.value.strip()
                 if len(prefix) == 0:
@@ -53,7 +53,7 @@ class TermBuildForm(npyscreen.Form):
             def display(self):
                 self.entry_widget.display()
 
-        self.connective = self.add(npyscreen.TitleSelectOne, name="Connective", values=["And", "Or"], scroll_exit = True, max_height=2)
+        self.connective = self.add(npyscreen.TitleSelectOne, name="Connective", values=["And", "Or", "Not"], scroll_exit = True, max_height = 3)
 
         self.field = self.add(npyscreen.TitleText, name="Field")
         self.input = self.add(npyscreen.TitleText, name="Input")

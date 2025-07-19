@@ -4,7 +4,7 @@ import path
 import os.path
 
 def isTerm(v) -> bool:
-    return isinstance(v, Or) or isinstance(v, And) or isinstance(v, Plain) or isinstance(v, Annotation)
+    return isinstance(v, Or) or isinstance(v, And) or isinstance(v, Plain) or isinstance(v, Annotation) or isinstance(v, Not)
 
 class Or:
     def __init__(self, *args):
@@ -18,6 +18,9 @@ class And:
         for arg in args:
             assert isTerm(arg)
         self.subforms = args
+class Not:
+    def __init__(self, arg):
+        self.subform = arg
 class Plain:
     def __init__(self, *args):
         assert len(args) > 0
@@ -34,7 +37,7 @@ class Annotation:
         sep = " "
         self.text = f"{repr(sep.join(args))}[{arg}]"
 
-ParsedTerm = typing.Union[Or, And, Plain, Annotation]
+ParsedTerm = typing.Union[Or, And, Plain, Annotation, Not]
 
 def render_term(parsed_term: ParsedTerm) -> str:
     sep = ""
@@ -49,6 +52,8 @@ def render_term(parsed_term: ParsedTerm) -> str:
         if len(l) == 1:
             return l[0]
         return "(" + sep.join(l) + ")"
+    if isinstance(parsed_term, Not):
+        return f"(NOT {render_term(parsed_term.subform)})"
     if isinstance(parsed_term, Plain) or isinstance(parsed_term, Annotation):
         return parsed_term.text
         
@@ -59,6 +64,8 @@ def cons_term(t, *args) -> ParsedTerm:
         return Or(*args)
     if t == "And":
         return And(*args)
+    if t == "Not":
+        return Not(*args)
     return Annotation(t, *args)
 
 code = ""

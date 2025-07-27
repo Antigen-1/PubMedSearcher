@@ -22,3 +22,5 @@ def test_term():
         term.compile_term("(Title/Abstract \\A)")
     with pytest.raises(Exception):
         term.compile_term("(Title/Abstract \\")
+    with pytest.raises(Exception):
+        term.compile_term("(Not (Plain A) (Plain B))")

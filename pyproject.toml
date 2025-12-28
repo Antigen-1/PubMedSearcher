@@ -1,6 +1,6 @@
 [project]
 name = "PubMedSearcher"
-version = "7.9.0"
+version = "7.10.0"
 description = "Save information of pubmed articles as a JSON file."
 readme = "README.md"
 requires-python = ">=3.11"
